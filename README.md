@@ -1,5 +1,8 @@
 # Carousel!
 
+## Demo
+Demo can be found [here](http://jenrefat.com/demos/carousel/ "Carousel")  
+
 ## /css
 * all Carousel styles
   
