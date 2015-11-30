@@ -8,7 +8,7 @@ describe("Carousel", function() {
       $thumbs,
       fixture; 
 
-  fixture = setFixtures('<section class="carouselContainer"><div class="carouselMain mask"><ul class="scrollable"><li><figure><img src="images/main1.jpg" alt="Slide image 1"/></figure></li><li><figure><img src="images/main2.jpg" alt="Slide image 2"/></figure></li><li><figure><img src="images/main3.jpg" alt="Slide image 3"/></figure></li><li><figure><img src="images/main4.jpg" alt="Slide image 4"/></figure></li><li><figure><img src="images/main5.jpg" alt="Slide image 5"/></figure></li></ul><ul class="nav"><li class="prev"><div class="navButton"><span></span></div></li><li class="next"><div class="navButton"><span></span></div></li></ul></div><div class="carouselThumbsContainer"><div class="carouselThumbs mask"><ul><li><img src="images/thumb1.jpg" alt="Thumb image 1"/></li><li><img src="images/thumb2.jpg" alt="Thumb image 2"/></li><li><img src="images/thumb3.jpg" alt="Thumb image 3"/></li><li><img src="images/thumb4.jpg" alt="Thumb image 4"/></li><li><img src="images/thumb5.jpg" alt="Thumb image 5"/></li></ul></div><ul class="nav"><li class="prev"><div class="navButton"><span></span></div></li><li class="next"><div class="navButton"><span></span></div></li></ul></div></section>');
+  fixture = setFixtures('<section class="carouselContainer"><div class="carouselMain mask"><ul class="scrollable"><li><figure><img src="images/main1.jpg" alt="Slide image 1"/></figure></li><li><figure><img src="images/main2.jpg" alt="Slide image 2"/></figure></li><li><figure><img src="images/main3.jpg" alt="Slide image 3"/></figure></li><li><figure><img src="images/main4.jpg" alt="Slide image 4"/></figure></li><li><figure><img src="images/main5.jpg" alt="Slide image 5"/></figure></li></ul><ul class="nav"><li class="prev"><div class="navButton"><span></span></div></li><li class="next"><div class="navButton"><span></span></div></li></ul></div><div class="carouselThumbsContainer"><div class="carouselThumbs mask"><ul class="scrollable"><li><img src="images/thumb1.jpg" alt="Thumb image 1"/></li><li><img src="images/thumb2.jpg" alt="Thumb image 2"/></li><li><img src="images/thumb3.jpg" alt="Thumb image 3"/></li><li><img src="images/thumb4.jpg" alt="Thumb image 4"/></li><li><img src="images/thumb5.jpg" alt="Thumb image 5"/></li></ul></div><ul class="nav"><li class="prev"><div class="navButton"><span></span></div></li><li class="next"><div class="navButton"><span></span></div></li></ul></div></section>');
   
   beforeEach(function() {
     $(document.body).append(fixture);
@@ -18,8 +18,9 @@ describe("Carousel", function() {
     $thumbs   = $el.find('.carouselThumbsContainer');
     
     carousel = new window.Carousel({
-      'main'   : $main,
-      'thumbs' : $thumbs
+      'main'            : $main,
+      'thumbs'          : $thumbs,
+      'thumbsVisible'   : 5
     });
     
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000;
@@ -35,7 +36,7 @@ describe("Carousel", function() {
         $nextButton;
 
     beforeEach(function(done) {
-      spyOn(carousel, 'setThumbnailButtonStatus');
+      spyOn(carousel, 'setThumbNavStatus');
       spyOn(carousel, 'setActiveThumbnail');
             
       carousel.init();
@@ -60,8 +61,8 @@ describe("Carousel", function() {
       expect($nextButton).toHaveClass('next');
     });
 
-    it('should call setThumbnailButtonStatus', function() {
-      expect(carousel.setThumbnailButtonStatus).toHaveBeenCalled();
+    it('should call setThumbNavStatus', function() {
+      expect(carousel.setThumbNavStatus).toHaveBeenCalled();
     });
 
     it('should call setActiveThumbnail', function() {
@@ -70,11 +71,15 @@ describe("Carousel", function() {
 
     it('should have a current position of 0', function() {
       expect(carousel.currentPos).toEqual(0);
-    })
+    });
 
     it('should set main image width', function() {
       var mainScrollableWidth = $(carousel.main).find('.scrollable').width();
       expect(mainScrollableWidth).toEqual(5000);
+    });
+
+    it('should set thumbnail offset to 0px', function() {
+      expect($(carousel.thumbs).find('.carouselThumbs .scrollable')).toHaveCss({'margin-left': '0px'});
     });
   });
   

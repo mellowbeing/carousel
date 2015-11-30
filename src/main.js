@@ -4,7 +4,8 @@ $thumbs   = $el.find('.carouselThumbsContainer');
 
 var carousel = new window.Carousel({
   'main'            : $main,
-  'thumbs'          : $thumbs
+  'thumbs'          : $thumbs,
+  'thumbsVisible'   : 5
 });
 
 carousel.init();

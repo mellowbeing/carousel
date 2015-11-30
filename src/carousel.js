@@ -14,7 +14,7 @@
 
   global.Carousel = function Carousel(params) {
 
-    var self		= this,
+    var self    = this,
         options = params || {};
 
     
@@ -28,7 +28,7 @@
     
       self.main             = $(options.main);
       self.thumbs           = $(options.thumbs);
-      self.thumbsPerSlide   = 5;
+      self.thumbsPerSlide   = options.thumbsVisible;
       self.currentPos       = 0;
       self.thumbOffset      = 0;
       
@@ -42,7 +42,6 @@
       self.thumbNavigation  = self.thumbs.find('.nav li');
       
       self.setupMain();
-      
       self.setupThumbs();
     };
     
@@ -67,7 +66,7 @@
         self.navigateMain($(this));
       });
       
-      self.setMainButtonStatus();
+      self.setMainNavStatus();
     };
     
     
@@ -105,8 +104,7 @@
         self.navigateMain($thumb);
       });
       
-      self.setThumbnailButtonStatus();
-      
+      self.setThumbNavStatus();
       self.setActiveThumbnail();
     };
     
@@ -120,17 +118,20 @@
     
       
     self.setupThumbListWidth = function(imageWidth) {
-      self.thumbTotalWidth  = self.thumbImageWidth * self.mainNumImages;
+      self.thumbTotalWidth  = self.thumbImageWidth * self.numThumbsTotal;
 
       // Set main list width
       self.thumbs.find('ul').addClass('scrollable').css("width", self.thumbTotalWidth + 'px');
+
+      self.thumbOffset        = (self.mainImageWidth - self.thumbImageWidth * self.thumbsPerSlide) / 2;
+      self.initialThumbOffset = self.thumbOffset;
+
+      self.updateThumbOffset();
+      self.setThumbNavStatus();
     };
     
     
-     /* 
-      navigate
-        - el: 
-      
+     /*
       Navigates the main images
     */
     
@@ -148,7 +149,7 @@
         self.currentPos++;
       }
       
-      self.setMainButtonStatus();
+      self.setMainNavStatus();
       
       // Calculate & set offset for image in view
       mainOffset = -(self.mainImageWidth * self.currentPos) + 'px';
@@ -159,55 +160,48 @@
       
       // If slide is not visible in thumbs, update thumb view
       currentSet = Math.floor(self.currentPos / self.thumbsPerSlide);
-      self.thumbOffset = -(currentSet * self.mainImageWidth);
+    
+      self.thumbOffset = -(currentSet * self.mainImageWidth) + self.initialThumbOffset;
       
-      self.setThumbnailButtonStatus();
+      self.setThumbNavStatus();
       
       // Update thumbnail animation
-      self.updateThumbOffset(self.thumbOffset);
+      self.updateThumbOffset();
     };
 
   
-    /* 
-      navigateThumbs
-      
+    /*
       Navigates the thumbnail images
     */
     self.navigateThumbs = function(el) {
     
       // Previous button slides thumbnails left
-      if (el.hasClass('prev') && self.thumbOffset < 0) {
+      if (el.hasClass('prev')) {
         self.thumbOffset += self.mainImageWidth;
       }
-      
       // Next button slides thumbnails right
-      if (el.hasClass('next') && self.thumbOffset > -(self.numThumbSets)) {
+      else {
         self.thumbOffset -= self.mainImageWidth;
       }
       
-      self.setThumbnailButtonStatus();
-      
       // Update thumbnail animation
-      self.updateThumbOffset(self.thumbOffset);
+      self.updateThumbOffset();
+      self.setThumbNavStatus();
     };
     
     
     /* 
-      updateThumbOffset
-      
       Animates thumbnail set
     */
-    self.updateThumbOffset = function(offset) {
-      self.thumbs.find('.scrollable').css("margin-left", offset);
+    self.updateThumbOffset = function() {
+      self.thumbs.find('.scrollable').css("margin-left", self.thumbOffset);
     };
     
     
     /*
-      setMainButtonStatus
-      
       Updates main navigation arrows' states
     */
-    self.setMainButtonStatus = function() {
+    self.setMainNavStatus = function() {
       
       // Update Previous & next buttons' status
       if (self.currentPos === 0) {
@@ -227,21 +221,19 @@
     
     
     /*
-      setThumbnailButtonStatus
-      
       Updates thumbnail navigation arrows' states
     */
-    self.setThumbnailButtonStatus = function() {
+    self.setThumbNavStatus = function() {
       
       // Update Previous & next buttons' status
-      if (self.thumbOffset === 0) {
+      if (self.thumbOffset === self.initialThumbOffset) {
         self.thumbNavigation.eq(0).addClass('inactive');
       }
       else {
         self.thumbNavigation.eq(0).removeClass('inactive');
       }
-      
-      if (self.thumbOffset === -(self.numThumbSets * self.mainImageWidth)) {
+
+      if (self.thumbOffset <= -(self.thumbTotalWidth - self.mainImageWidth) + self.initialThumbOffset) {
         self.thumbNavigation.eq(1).addClass('inactive');
       }
       else {
@@ -251,8 +243,6 @@
     
     
     /*
-        setActiveThumbnail
-        
         Displays current active thumbnail
     */
     self.setActiveThumbnail = function() {
